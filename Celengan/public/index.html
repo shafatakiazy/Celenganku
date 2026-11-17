@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Celenganku</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Manrope:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --sky: #d6ecf8;
+      --ink: #1b2a47;
+      --muted: #55637f;
+      --paper: #ffffff;
+      --pink: #ff9db6;
+      --pink-deep: #e8658a;
+      --pink-soft: #ffd3df;
+      --gold: #ffc53d;
+      --gold-deep: #e8a317;
+      --mint-text: #0f7a57;
+      --mint-bg: #d9f5ea;
+      --coral-text: #bf2f36;
+      --coral-bg: #ffe1e2;
+      --font-display: 'Fredoka', 'Trebuchet MS', system-ui, sans-serif;
+      --font-body: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--sky);
+      color: var(--ink);
+      font-family: var(--font-body);
+      line-height: 1.5;
+    }
+    button, input, select { font: inherit; color: inherit; }
+    :focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+    .layout {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 4rem;
+      display: grid;
+      grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+      gap: 2.5rem;
+      align-items: start;
+    }
+
+    /* ---------- Celengan ---------- */
+    .hero { position: sticky; top: 1.5rem; }
+    h1 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 2.4rem;
+      line-height: 1.1;
+      margin: 0 0 .25rem;
+    }
+    .tagline { margin: 0 0 1rem; color: var(--muted); }
+    .piggy { width: 100%; height: auto; display: block; overflow: visible; }
+    .piggy-wrap.oink { animation: oink .5s ease-out; transform-origin: 50% 90%; }
+    #level { transition: transform 1s cubic-bezier(.3, 1.2, .5, 1); }
+    #coin { opacity: 0; }
+    #coin.drop { animation: coin-drop .9s ease-in both; }
+    #coin.take { animation: coin-take .9s ease-out both; }
+
+    @keyframes coin-drop {
+      0%   { transform: translateY(0); opacity: 0; }
+      12%  { opacity: 1; }
+      100% { transform: translateY(78px); opacity: 1; }
+    }
+    @keyframes coin-take {
+      0%   { transform: translateY(78px); opacity: 1; }
+      60%  { opacity: 1; }
+      100% { transform: translateY(-14px); opacity: 0; }
+    }
+    @keyframes oink {
+      0%   { transform: scale(1); }
+      30%  { transform: scale(1.04, .96); }
+      60%  { transform: scale(.98, 1.03); }
+      100% { transform: scale(1); }
+    }
+
+    .saldo-label { margin: 1rem 0 0; color: var(--muted); font-weight: 500; }
+    .saldo {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: clamp(2.4rem, 8vw, 3.4rem);
+      line-height: 1.1;
+      margin: 0;
+      font-variant-numeric: tabular-nums;
+    }
+    .progress-text { margin: .25rem 0 1rem; }
+    .bar {
+      height: 14px;
+      border: 3px solid var(--ink);
+      border-radius: 999px;
+      background: var(--paper);
+      overflow: hidden;
+      margin-bottom: 1.25rem;
+    }
+    .bar > span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: var(--gold);
+      border-right: 3px solid var(--ink);
+      transition: width 1s cubic-bezier(.3, 1.2, .5, 1);
+    }
+    .bar > span[style*="width: 0%"] { border-right: 0; }
+
+    .target-form { display: flex; gap: .5rem; align-items: end; flex-wrap: wrap; margin-bottom: 1.25rem; }
+    .target-form label { display: grid; gap: .25rem; font-weight: 700; flex: 1 1 160px; }
+
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin: 0; }
+    .stats div { background: var(--paper); border: 3px solid var(--ink); border-radius: 18px; padding: .6rem .9rem; }
+    .stats dt { font-size: .9rem; color: var(--muted); font-weight: 500; }
+    .stats dd { margin: 0; font-family: var(--font-display); font-weight: 600; font-size: 1.2rem; font-variant-numeric: tabular-nums; }
+    .stats .in dd { color: var(--mint-text); }
+    .stats .out dd { color: var(--coral-text); }
+
+    /* ---------- Form ---------- */
+    .panel {
+      background: var(--paper);
+      border: 3px solid var(--ink);
+      border-radius: 26px;
+      box-shadow: 6px 6px 0 var(--ink);
+      padding: 1.25rem;
+      display: grid;
+      gap: 1rem;
+    }
+    h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.5rem; margin: 0; }
+    .toggle { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+    .toggle button {
+      border: 3px solid var(--ink);
+      background: var(--paper);
+      border-radius: 16px;
+      padding: .65rem;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 1.05rem;
+      cursor: pointer;
+    }
+    .toggle button[aria-pressed="true"].masuk { background: var(--gold); }
+    .toggle button[aria-pressed="true"].keluar { background: var(--pink); }
+
+    .fields { display: grid; grid-template-columns: 1fr 1fr; gap: .85rem; }
+    .field { display: grid; gap: .25rem; font-weight: 700; }
+    .field.wide { grid-column: 1 / -1; }
+    input, select {
+      width: 100%;
+      padding: .6rem .75rem;
+      background: var(--paper);
+      border: 3px solid var(--ink);
+      border-radius: 14px;
+      font-weight: 500;
+    }
+    .chips { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .4rem; }
+    .chip {
+      border: 2px solid var(--ink);
+      background: var(--pink-soft);
+      border-radius: 999px;
+      padding: .15rem .7rem;
+      font-weight: 700;
+      font-size: .9rem;
+      cursor: pointer;
+    }
+    .actions-row { display: flex; gap: .6rem; flex-wrap: wrap; }
+    .btn {
+      border: 3px solid var(--ink);
+      border-radius: 16px;
+      padding: .65rem 1.2rem;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 1.05rem;
+      cursor: pointer;
+      background: var(--gold);
+      box-shadow: 3px 3px 0 var(--ink);
+      transition: transform .1s, box-shadow .1s;
+    }
+    .btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--ink); }
+    .btn.keluar { background: var(--pink); }
+    .btn.plain { background: var(--paper); }
+    .btn.small { padding: .4rem .9rem; font-size: .95rem; }
+
+    #msg { min-height: 1.5rem; margin: 0; font-weight: 700; }
+    #msg.error { color: var(--coral-text); }
+    #msg.ok { color: var(--mint-text); }
+
+    /* ---------- Riwayat ---------- */
+    .history { margin-top: 2rem; }
+    .history h2 { margin-bottom: .75rem; }
+    #list { list-style: none; margin: 0; padding: 0; display: grid; gap: .6rem; }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: .25rem .75rem;
+      align-items: center;
+      background: var(--paper);
+      border: 3px solid var(--ink);
+      border-radius: 18px;
+      padding: .7rem .9rem;
+    }
+    .row .title { font-weight: 700; overflow-wrap: anywhere; }
+    .row .meta { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; font-size: .9rem; color: var(--muted); }
+    .tag { border-radius: 999px; padding: 0 .6rem; font-weight: 700; font-size: .85rem; }
+    .row.masuk .tag { background: var(--mint-bg); color: var(--mint-text); }
+    .row.keluar .tag { background: var(--coral-bg); color: var(--coral-text); }
+    .amount { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; text-align: right; font-variant-numeric: tabular-nums; }
+    .row.masuk .amount { color: var(--mint-text); }
+    .row.keluar .amount { color: var(--coral-text); }
+    .row .buttons { grid-column: 1 / -1; display: flex; gap: .4rem; }
+    .empty {
+      background: var(--paper);
+      border: 3px dashed var(--ink);
+      border-radius: 18px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    @media (max-width: 860px) {
+      .layout { grid-template-columns: 1fr; gap: 1.5rem; }
+      .hero { position: static; }
+      .piggy-wrap { max-width: 360px; margin: 0 auto; }
+    }
+    @media (max-width: 480px) {
+      .fields { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="layout">
+    <!-- ===== Celengan ===== -->
+    <section class="hero" aria-labelledby="judul">
+      <h1 id="judul">Celenganku</h1>
+      <p class="tagline">Isi dan ambil uang, lihat celenganmu terisi sampai target.</p>
+
+      <div class="piggy-wrap" id="piggyWrap">
+        <svg class="piggy" viewBox="0 0 420 330" role="img" aria-labelledby="piggyTitle">
+          <title id="piggyTitle">Celengan babi yang terisi koin sesuai saldo</title>
+          <defs>
+            <clipPath id="bodyClip"><ellipse cx="210" cy="170" rx="150" ry="100" /></clipPath>
+          </defs>
+
+          <ellipse cx="210" cy="314" rx="130" ry="9" fill="#1b2a47" opacity=".14" />
+
+          <!-- koin yang jatuh (digambar sebelum badan supaya masuk ke dalam lubang) -->
+          <g id="coin">
+            <circle cx="210" cy="26" r="21" fill="#ffc53d" stroke="#1b2a47" stroke-width="4" />
+            <circle cx="210" cy="26" r="12" fill="none" stroke="#e8a317" stroke-width="4" />
+          </g>
+
+          <!-- ekor -->
+          <path d="M62 168 C28 160 28 124 54 122 C72 121 68 142 52 138" fill="none" stroke="#e8658a" stroke-width="9" stroke-linecap="round" />
+          <!-- kaki -->
+          <rect x="116" y="246" width="44" height="56" rx="18" fill="#e8658a" stroke="#1b2a47" stroke-width="5" />
+          <rect x="262" y="246" width="44" height="56" rx="18" fill="#e8658a" stroke="#1b2a47" stroke-width="5" />
+          <!-- telinga -->
+          <path d="M146 92 L136 38 L196 72 Z" fill="#e8658a" stroke="#1b2a47" stroke-width="5" stroke-linejoin="round" />
+          <path d="M274 92 L290 38 L232 72 Z" fill="#e8658a" stroke="#1b2a47" stroke-width="5" stroke-linejoin="round" />
+
+          <!-- badan -->
+          <ellipse cx="210" cy="170" rx="150" ry="100" fill="#ffd3df" />
+          <g clip-path="url(#bodyClip)">
+            <g id="level" style="transform: translateY(290px)">
+              <path d="M-40 0 q30 -14 60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 V260 H-40 Z" fill="#e8a317" opacity=".55" transform="translate(-14 6)" />
+              <path d="M-40 0 q30 -14 60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 t60 0 V260 H-40 Z" fill="#ffc53d" />
+            </g>
+            <path d="M92 130 Q110 96 150 84" fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" opacity=".7" />
+          </g>
+          <ellipse cx="210" cy="170" rx="150" ry="100" fill="none" stroke="#1b2a47" stroke-width="5" />
+
+          <!-- moncong, mata, pipi -->
+          <ellipse cx="352" cy="180" rx="36" ry="28" fill="#ff9db6" stroke="#1b2a47" stroke-width="5" />
+          <ellipse cx="343" cy="180" rx="4" ry="8" fill="#1b2a47" />
+          <ellipse cx="362" cy="180" rx="4" ry="8" fill="#1b2a47" />
+          <circle cx="298" cy="140" r="7" fill="#1b2a47" />
+          <circle cx="306" cy="172" r="13" fill="#e8658a" opacity=".45" />
+
+          <!-- lubang koin -->
+          <rect x="178" y="64" width="64" height="12" rx="6" fill="#1b2a47" />
+        </svg>
+      </div>
+
+      <p class="saldo-label">Isi celengan sekarang</p>
+      <p class="saldo" id="saldo">Rp 0</p>
+      <p class="progress-text" id="progressText">0% dari target Rp 1.000.000</p>
+      <div class="bar" role="progressbar" aria-labelledby="progressText" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="bar">
+        <span id="barFill" style="width: 0%"></span>
+      </div>
+
+      <form class="target-form" id="targetForm">
+        <label for="target">Target tabungan (Rp)
+          <input id="target" type="number" min="1" step="1" inputmode="numeric" required />
+        </label>
+        <button class="btn plain small" type="submit">Simpan target</button>
+      </form>
+
+      <dl class="stats">
+        <div class="in"><dt>Total masuk</dt><dd id="totalMasuk">Rp 0</dd></div>
+        <div class="out"><dt>Total keluar</dt><dd id="totalKeluar">Rp 0</dd></div>
+      </dl>
+    </section>
+
+    <!-- ===== Form dan riwayat ===== -->
+    <div>
+      <form class="panel" id="form" novalidate>
+        <h2 id="formTitle">Catat transaksi</h2>
+
+        <div class="toggle" role="group" aria-label="Jenis transaksi">
+          <button type="button" class="masuk" id="tMasuk" aria-pressed="true">Uang masuk</button>
+          <button type="button" class="keluar" id="tKeluar" aria-pressed="false">Uang keluar</button>
+        </div>
+
+        <div class="fields">
+          <label class="field" for="amount">Jumlah (Rp)
+            <input id="amount" type="number" min="1" step="1" inputmode="numeric" placeholder="25000" required />
+            <span class="chips" aria-label="Tambah cepat">
+              <button type="button" class="chip" data-add="10000">+10.000</button>
+              <button type="button" class="chip" data-add="50000">+50.000</button>
+              <button type="button" class="chip" data-add="100000">+100.000</button>
+            </span>
+          </label>
+          <label class="field" for="date">Tanggal
+            <input id="date" type="date" required />
+          </label>
+          <label class="field" for="category">Kategori
+            <select id="category"></select>
+          </label>
+          <label class="field" for="note">Keterangan
+            <input id="note" type="text" maxlength="100" placeholder="Contoh: sisa uang makan" />
+          </label>
+        </div>
+
+        <p id="msg" role="alert"></p>
+
+        <div class="actions-row">
+          <button type="submit" class="btn" id="submitBtn">Isi celengan</button>
+          <button type="button" class="btn plain" id="cancelBtn" hidden>Batal</button>
+        </div>
+      </form>
+
+      <section class="history" aria-labelledby="riwayatJudul">
+        <h2 id="riwayatJudul">Riwayat</h2>
+        <ul id="list"></ul>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const fmt = new Intl.NumberFormat('id-ID');
+    const rupiah = (n) => 'Rp ' + fmt.format(n);
+    const fmtDate = (d) =>
+      new Date(d + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+    const todayISO = () => {
+      const t = new Date();
+      t.setMinutes(t.getMinutes() - t.getTimezoneOffset());
+      return t.toISOString().slice(0, 10);
+    };
+
+    const CATEGORIES = {
+      masuk: ['Uang saku', 'Honor', 'Hadiah', 'Lainnya'],
+      keluar: ['Makan', 'Transport', 'Kuliah', 'Organisasi', 'Hiburan', 'Lainnya'],
+    };
+    const LABEL = {
+      masuk: { submit: 'Isi celengan', done: 'Celengan terisi' },
+      keluar: { submit: 'Ambil uang', done: 'Uang diambil' },
+    };
+
+    const state = { type: 'masuk', editId: null, items: [], saldo: 0, target: 1000000 };
+
+    // Target disimpan di browser (tabel di database hanya untuk transaksi)
+    try {
+      const saved = Number(localStorage.getItem('celengan.target'));
+      if (saved > 0) state.target = saved;
+    } catch (e) { /* abaikan jika penyimpanan diblokir */ }
+
+    async function api(url, options) {
+      const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...options });
+      if (res.status === 204) return null;
+      const contentType = res.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        const detail = (await res.text()).trim().replace(/\s+/g, ' ');
+        if (!res.ok) {
+          throw new Error(`Permintaan ditolak (HTTP ${res.status})${detail ? `: ${detail}` : ''}. Jalankan aplikasi dengan "npm start" lalu buka http://localhost:3000.`);
+        }
+        throw new Error(`Server mengirim respons selain JSON (HTTP ${res.status}). Jalankan aplikasi dengan "npm start" lalu buka http://localhost:3000.`);
+      }
+
+      const data = await res.json();
+      if (!res.ok) {
+        const message = (data.errors || [data.error]).filter(Boolean).join(' ');
+        throw new Error(message || `Permintaan gagal (HTTP ${res.status}).`);
+      }
+      return data;
+    }
+
+    function say(text, kind) {
+      const el = $('msg');
+      el.textContent = text || '';
+      el.className = kind || '';
+    }
+
+    // ---------- Celengan ----------
+    function renderPiggy() {
+      const pct = state.target > 0 ? Math.max(0, Math.min(1, state.saldo / state.target)) : 0;
+      const y = pct === 0 ? 290 : 270 - 200 * pct; // 270 = dasar badan, 70 = puncak badan
+      $('level').style.transform = `translateY(${y}px)`;
+      $('saldo').textContent = rupiah(state.saldo);
+      const shown = Math.round(pct * 100);
+      $('progressText').textContent = state.saldo >= state.target
+        ? `Target ${rupiah(state.target)} tercapai`
+        : `${shown}% dari target ${rupiah(state.target)}`;
+      $('barFill').style.width = shown + '%';
+      $('bar').setAttribute('aria-valuenow', shown);
+      $('target').value = state.target;
+    }
+
+    function animate(type) {
+      const coin = $('coin');
+      coin.classList.remove('drop', 'take');
+      void coin.getBoundingClientRect(); // restart animasi
+      coin.classList.add(type === 'masuk' ? 'drop' : 'take');
+      const wrap = $('piggyWrap');
+      wrap.classList.remove('oink');
+      void wrap.offsetWidth;
+      wrap.classList.add('oink');
+    }
+
+    // ---------- Form ----------
+    function fillCategories(selected) {
+      const sel = $('category');
+      const options = [...CATEGORIES[state.type]];
+      if (selected && !options.includes(selected)) options.push(selected);
+      sel.replaceChildren(...options.map((c) => new Option(c, c)));
+      sel.value = selected && options.includes(selected) ? selected : options[0];
+    }
+
+    function setType(type, selectedCategory) {
+      state.type = type;
+      $('tMasuk').setAttribute('aria-pressed', String(type === 'masuk'));
+      $('tKeluar').setAttribute('aria-pressed', String(type === 'keluar'));
+      const btn = $('submitBtn');
+      btn.className = 'btn' + (type === 'keluar' ? ' keluar' : '');
+      btn.textContent = state.editId ? 'Simpan perubahan' : LABEL[type].submit;
+      fillCategories(selectedCategory);
+    }
+
+    function resetForm() {
+      state.editId = null;
+      $('form').reset();
+      $('date').value = todayISO();
+      $('formTitle').textContent = 'Catat transaksi';
+      $('cancelBtn').hidden = true;
+      setType(state.type);
+    }
+
+    $('tMasuk').addEventListener('click', () => setType('masuk'));
+    $('tKeluar').addEventListener('click', () => setType('keluar'));
+
+    document.querySelectorAll('.chip').forEach((chip) =>
+      chip.addEventListener('click', () => {
+        $('amount').value = (Number($('amount').value) || 0) + Number(chip.dataset.add);
+      })
+    );
+
+    $('form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      say('');
+      const body = JSON.stringify({
+        type: state.type,
+        amount: $('amount').value,
+        date: $('date').value,
+        category: $('category').value,
+        note: $('note').value,
+      });
+      const editing = state.editId;
+      try {
+        const saved = await api(editing ? `/api/transactions/${editing}` : '/api/transactions', {
+          method: editing ? 'PUT' : 'POST',
+          body,
+        });
+        resetForm();
+        await load();
+        animate(saved.type);
+        say(editing ? 'Perubahan tersimpan.' : `${LABEL[saved.type].done} ${rupiah(saved.amount)}.`, 'ok');
+      } catch (err) {
+        say(err.message, 'error');
+      }
+    });
+
+    $('cancelBtn').addEventListener('click', () => { resetForm(); say(''); });
+
+    $('targetForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const value = Number($('target').value);
+      if (!Number.isInteger(value) || value <= 0) {
+        say('Target harus bilangan bulat lebih dari 0.', 'error');
+        return;
+      }
+      state.target = value;
+      try { localStorage.setItem('celengan.target', String(value)); } catch (e2) { /* abaikan */ }
+      renderPiggy();
+      say('Target tersimpan.', 'ok');
+    });
+
+    // ---------- Riwayat ----------
+    function renderList() {
+      const list = $('list');
+      if (!state.items.length) {
+        const li = document.createElement('li');
+        li.className = 'empty';
+        li.textContent = 'Celenganmu masih kosong. Catat uang masuk pertamamu lewat formulir.';
+        list.replaceChildren(li);
+        return;
+      }
+      list.replaceChildren(...state.items.map((t) => {
+        const li = document.createElement('li');
+        li.className = 'row ' + t.type;
+
+        const info = document.createElement('div');
+        const title = document.createElement('div');
+        title.className = 'title';
+        title.textContent = t.note || t.category || (t.type === 'masuk' ? 'Uang masuk' : 'Uang keluar');
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        if (t.category) {
+          const tag = document.createElement('span');
+          tag.className = 'tag';
+          tag.textContent = t.category;
+          meta.append(tag);
+        }
+        const date = document.createElement('span');
+        date.textContent = fmtDate(t.date);
+        meta.append(date);
+        info.append(title, meta);
+
+        const amount = document.createElement('div');
+        amount.className = 'amount';
+        amount.textContent = (t.type === 'masuk' ? '+' : '-') + rupiah(t.amount);
+
+        const buttons = document.createElement('div');
+        buttons.className = 'buttons';
+        const edit = document.createElement('button');
+        edit.className = 'btn plain small';
+        edit.type = 'button';
+        edit.textContent = 'Ubah';
+        edit.addEventListener('click', () => startEdit(t));
+        const del = document.createElement('button');
+        del.className = 'btn plain small';
+        del.type = 'button';
+        del.textContent = 'Hapus';
+        del.addEventListener('click', () => remove(t));
+        buttons.append(edit, del);
+
+        li.append(info, amount, buttons);
+        return li;
+      }));
+    }
+
+    function startEdit(t) {
+      state.editId = t.id;
+      setType(t.type, t.category);
+      $('amount').value = t.amount;
+      $('date').value = t.date;
+      $('note').value = t.note;
+      $('formTitle').textContent = 'Ubah transaksi';
+      $('submitBtn').textContent = 'Simpan perubahan';
+      $('cancelBtn').hidden = false;
+      say('');
+      $('amount').focus();
+      $('form').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    async function remove(t) {
+      if (!confirm(`Hapus ${t.type === 'masuk' ? 'uang masuk' : 'uang keluar'} ${rupiah(t.amount)}?`)) return;
+      try {
+        await api(`/api/transactions/${t.id}`, { method: 'DELETE' });
+        if (state.editId === t.id) resetForm();
+        await load();
+        say('Terhapus.', 'ok');
+      } catch (err) {
+        say(err.message, 'error');
+      }
+    }
+
+    // ---------- Muat data ----------
+    async function load() {
+      const [items, summary] = await Promise.all([api('/api/transactions'), api('/api/summary')]);
+      state.items = items;
+      state.saldo = summary.saldo;
+      $('totalMasuk').textContent = rupiah(summary.total_masuk);
+      $('totalKeluar').textContent = rupiah(summary.total_keluar);
+      renderPiggy();
+      renderList();
+    }
+
+    resetForm();
+    load().catch((err) => say(err.message, 'error'));
+  </script>
+</body>
+</html>
